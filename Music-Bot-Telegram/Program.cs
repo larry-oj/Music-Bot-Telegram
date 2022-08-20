@@ -12,6 +12,8 @@ var host = Host.CreateDefaultBuilder(args)
         // configuration pattern
         services.Configure<TelegramConfiguration>(
             context.Configuration.GetSection(TelegramConfiguration.Configuration));
+        services.Configure<MyApiConfiguration>(
+            context.Configuration.GetSection(MyApiConfiguration.Configuration));
 
         // db
         services.AddDbContextFactory<BotDbContext>(o =>
@@ -34,6 +36,9 @@ var host = Host.CreateDefaultBuilder(args)
             return new TelegramBotClient(options);
         });
         services.AddHostedService<PollingService>();
+
+        services.AddHttpClient();
+        services.AddSingleton<IMyApiService, MyApiService>();
     })
     .Build();
 
