@@ -17,7 +17,7 @@ public class Repo<T> : IDisposable where T : class, IEntity
     public IEnumerable<T> GetAll() 
         => _entities.AsEnumerable();
 
-    public T? Get(int id) 
+    public T? Get(long id) 
         => _entities.FirstOrDefault(e => e.Id == id);
 
     public void Insert(T entity)

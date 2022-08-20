@@ -5,7 +5,7 @@ namespace Music_Bot_Telegram.Data.Models;
 
 public class Action : IEntity
 {
-    [Key] [DatabaseGenerated(DatabaseGeneratedOption.Identity)] public int Id { get; set; }
+    [Key] [DatabaseGenerated(DatabaseGeneratedOption.Identity)] public long Id { get; set; }
     public User User { get; set; }
     public ActionType Type { get; set; }
     [Required] public string Data { get; set; }
