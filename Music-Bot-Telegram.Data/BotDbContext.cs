@@ -9,16 +9,15 @@ public class BotDbContext : DbContext
     public DbSet<Models.Action> Actions { get; set; }
     public DbSet<ActionType> ActionTypes { get; set; }
 
-    // public BotDbContext(DbContextOptions<BotDbContext> options)
-    //     : base(options)
-    // {
-    //     // ...
-    // }
+    public BotDbContext(DbContextOptions<BotDbContext> options)
+        : base(options)
+    {
+        // ...
+    }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // ...
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=musicbotdb;Username=postgres;Password=superuser");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

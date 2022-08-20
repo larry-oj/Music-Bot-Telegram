@@ -9,4 +9,13 @@ public class User : IEntity
     public bool IsBanned { get; set; } = false;
     public bool IsActiveSession { get; set; } = false;
     public List<Action> Actions { get; set; }
+
+    public User()
+    {
+    }
+    
+    public User(int id)
+    {
+        Id = id;
+    }
 }
