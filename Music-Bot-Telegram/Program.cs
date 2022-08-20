@@ -1,7 +1,8 @@
-using Music_Bot_Telegram;
-
 IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services => { services.AddHostedService<Worker>(); })
+    .ConfigureServices(services =>
+    {
+        
+    })
     .Build();
 
 await host.RunAsync();
