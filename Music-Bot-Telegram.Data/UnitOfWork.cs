@@ -1,4 +1,5 @@
-﻿using Music_Bot_Telegram.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Music_Bot_Telegram.Data.Models;
 using Action = Music_Bot_Telegram.Data.Models.Action;
 
 namespace Music_Bot_Telegram.Data;
@@ -17,9 +18,9 @@ public class UnitOfWork : IUnitOfWork
     public Repo<ActionType> ActionTypes
         => _actionTypeRepo ??= new Repo<ActionType>(_context);
 
-    public UnitOfWork(BotDbContext botDbContext)
+    public UnitOfWork(IDbContextFactory<BotDbContext> contextFactory)
     {
-        _context = botDbContext;
+        _context = contextFactory.CreateDbContext();
     }
 
     public void Save()
