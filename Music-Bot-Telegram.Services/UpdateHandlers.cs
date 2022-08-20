@@ -40,7 +40,7 @@ public class UpdateHandlers
     
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Update received: {0}", update);
+        _logger.LogInformation("Update received");
 
         using var unitOfWork = _unitOfWorkFactory.Create();
         var handler = update switch
@@ -87,7 +87,7 @@ public class UpdateHandlers
             
             return;
         }
-        await command.ExecuteAsync(botClient, message, unitOfWork);
+        await command.ExecuteAsync(botClient, message, user, unitOfWork);
     }
     
     private Task OnUnknownAsync(Update update, CancellationToken cancellationToken = default)

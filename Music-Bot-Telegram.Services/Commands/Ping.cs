@@ -1,6 +1,7 @@
 ﻿using Music_Bot_Telegram.Data;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using User = Music_Bot_Telegram.Data.Models.User;
 
 namespace Music_Bot_Telegram.Services.Commands;
 
@@ -15,7 +16,7 @@ public class Ping : ICommand
     public bool IsAdmin 
         => false;
     
-    public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, IUnitOfWork unitOfWork)
+    public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, User user, IUnitOfWork unitOfWork)
     {
         await botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
