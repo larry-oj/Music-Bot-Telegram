@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Music-Bot-Telegram", "Music
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Music-Bot-Telegram.Data", "..\Music-Bot-Telegram.Data\Music-Bot-Telegram.Data.csproj", "{F6CD72DB-1A5E-46A5-83D9-4FA1FB63317A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Music-Bot-Telegram.Services", "..\Music-Bot-Telegram.Services\Music-Bot-Telegram.Services.csproj", "{A576490D-C481-47B1-8747-6F82C318AE69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,5 +24,9 @@ Global
 		{F6CD72DB-1A5E-46A5-83D9-4FA1FB63317A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6CD72DB-1A5E-46A5-83D9-4FA1FB63317A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6CD72DB-1A5E-46A5-83D9-4FA1FB63317A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A576490D-C481-47B1-8747-6F82C318AE69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A576490D-C481-47B1-8747-6F82C318AE69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A576490D-C481-47B1-8747-6F82C318AE69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A576490D-C481-47B1-8747-6F82C318AE69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
