@@ -16,5 +16,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Music-Bot-Telegram.Data\Music-Bot-Telegram.Data.csproj" />
+      <ProjectReference Include="..\Music-Bot-Telegram.Services\Music-Bot-Telegram.Services.csproj" />
     </ItemGroup>
 </Project>
