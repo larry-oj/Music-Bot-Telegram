@@ -12,6 +12,9 @@ var host = Host.CreateDefaultBuilder(args)
         // db
         services.AddDbContextFactory<BotDbContext>(o =>
             o.UseNpgsql(context.Configuration.GetConnectionString("Database:ConnectionString")));
+            
+        // services
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     })
     .Build();
 
