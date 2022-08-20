@@ -7,5 +7,6 @@ public class User : IEntity
     [Key] public int Id { get; set; }
     public bool IsAdmin { get; set; } = false;
     public bool IsBanned { get; set; } = false;
+    public bool IsActiveSession { get; set; } = false;
     public List<Action> Actions { get; set; }
 }
