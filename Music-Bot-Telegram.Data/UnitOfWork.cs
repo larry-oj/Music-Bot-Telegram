@@ -9,14 +9,11 @@ public class UnitOfWork : IUnitOfWork
     private readonly BotDbContext _context;
     private Repo<User> _userRepo;
     private Repo<Models.Action> _actionRepo;
-    private Repo<ActionType> _actionTypeRepo;
-    
+
     public Repo<User> Users 
         => _userRepo ??= new Repo<User>(_context);
     public Repo<Models.Action> Actions 
         => _actionRepo ??= new Repo<Models.Action>(_context);
-    public Repo<ActionType> ActionTypes
-        => _actionTypeRepo ??= new Repo<ActionType>(_context);
 
     public UnitOfWork(IDbContextFactory<BotDbContext> contextFactory)
     {

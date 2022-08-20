@@ -6,8 +6,7 @@ public interface IUnitOfWork : IDisposable
 {
     Repo<User> Users { get; }
     Repo<Models.Action> Actions { get; }
-    Repo<ActionType> ActionTypes { get; }
-    
+
     void Save();
     Task SaveAsync();
 }

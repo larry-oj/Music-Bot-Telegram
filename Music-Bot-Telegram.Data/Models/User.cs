@@ -14,7 +14,7 @@ public class User : IEntity
     {
     }
     
-    public User(int id)
+    public User(long id)
     {
         Id = id;
     }

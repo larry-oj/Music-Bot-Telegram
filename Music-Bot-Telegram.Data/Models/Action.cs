@@ -7,7 +7,7 @@ public class Action : IEntity
 {
     [Key] [DatabaseGenerated(DatabaseGeneratedOption.Identity)] public long Id { get; set; }
     public User User { get; set; }
-    public ActionType Type { get; set; }
+    public string Command { get; set; }
     [Required] public string Data { get; set; }
     public int? Stage { get; set; }
     [Required] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -16,10 +16,10 @@ public class Action : IEntity
     {
     }
     
-    public Action(User user, ActionType type, string data, int? stage)
+    public Action(User user, string command, string data, int? stage)
     {
         User = user;
-        Type = type;
+        Command = command;
         Data = data;
         Stage = stage;
     }
