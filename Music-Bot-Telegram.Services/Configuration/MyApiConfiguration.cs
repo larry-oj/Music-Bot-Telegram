@@ -1,4 +1,4 @@
-﻿namespace Music_Bot_Telegram.Configuration;
+﻿namespace Music_Bot_Telegram.Services.Configuration;
 
 public class MyApiConfiguration
 {
