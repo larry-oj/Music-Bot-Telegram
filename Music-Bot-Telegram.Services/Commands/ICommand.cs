@@ -10,5 +10,5 @@ public interface ICommand
     string Name { get; }
     string Description { get; }
     bool IsAdmin { get; }
-    Task ExecuteAsync(ITelegramBotClient botClient, Message message, User user, IUnitOfWork unitOfWork);
+    Task ExecuteAsync(ITelegramBotClient botClient, Message message, User user);
 }

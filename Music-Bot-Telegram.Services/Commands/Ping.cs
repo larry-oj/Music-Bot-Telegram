@@ -16,7 +16,7 @@ public class Ping : ICommand
     public bool IsAdmin 
         => false;
     
-    public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, User user, IUnitOfWork unitOfWork)
+    public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, User user)
     {
         await botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,

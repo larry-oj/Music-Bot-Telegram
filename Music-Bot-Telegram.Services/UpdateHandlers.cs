@@ -13,18 +13,12 @@ namespace Music_Bot_Telegram.Services;
 public class UpdateHandlers
 {
     private readonly ILogger<UpdateHandlers> _logger;
-    private readonly IUnitOfWorkFactory _unitOfWorkFactory;
-    private readonly IEnumerable<ICommand> _commands;
+    private readonly IServiceProvider _serviceProvider;
 
     public UpdateHandlers(
         ILogger<UpdateHandlers> logger,
-        IUnitOfWorkFactory unitOfWorkFactory,
-        IServiceProvider serviceProvider)
-    {
-        _logger = logger;
-        _unitOfWorkFactory = unitOfWorkFactory;
-        _commands = serviceProvider.GetServices<ICommand>();
-    }
+        IServiceProvider serviceProvider) => 
+        (_logger, _serviceProvider) = (logger, serviceProvider);
     
     public Task PollingErrorHandler(ITelegramBotClient _, Exception exception, CancellationToken cancellationToken = default)
     {
@@ -42,27 +36,33 @@ public class UpdateHandlers
     {
         _logger.LogInformation("Update received");
 
-        using var unitOfWork = _unitOfWorkFactory.Create();
+        using var scope = _serviceProvider.CreateScope();
+        
         var handler = update switch
         {
-            { Message: { } message } => OnMessageAsync(botClient, message, unitOfWork, cancellationToken),
+            { Message: { } message } => OnMessageAsync(botClient, message, scope, cancellationToken),
             _ => OnUnknownAsync(update, cancellationToken)
         };
 
         await handler;
     }
 
-    private async Task OnMessageAsync(ITelegramBotClient botClient, Message message, IUnitOfWork unitOfWork, CancellationToken cancellationToken)
+    private async Task OnMessageAsync(ITelegramBotClient botClient, Message message, IServiceScope scope, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(message.Text))
             return;
 
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        
         if (unitOfWork.Users.Get(message.From!.Id) is not { } user)
         {
             user = new Data.Models.User(message.From.Id);
             unitOfWork.Users.Insert(user);
             await unitOfWork.SaveAsync();
         }
+
+        if (!user.IsActiveSession && !message.Text.StartsWith("/"))
+            return;
 
         var commandName = user.IsActiveSession switch
         {
@@ -77,7 +77,9 @@ public class UpdateHandlers
                 .ToLower()
         };
         
-        var command = _commands.FirstOrDefault(c => c.Name == commandName);
+        var commands = scope.ServiceProvider.GetRequiredService<IEnumerable<ICommand>>();
+        
+        var command = commands.FirstOrDefault(c => c.Name == commandName);
         if (command is null)
         {
             await botClient.SendTextMessageAsync(
@@ -87,7 +89,7 @@ public class UpdateHandlers
             
             return;
         }
-        await command.ExecuteAsync(botClient, message, user, unitOfWork);
+        await command.ExecuteAsync(botClient, message, user);
     }
     
     private Task OnUnknownAsync(Update update, CancellationToken cancellationToken = default)

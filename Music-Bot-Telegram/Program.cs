@@ -26,7 +26,7 @@ var host = Host.CreateDefaultBuilder(args)
             .Where(type => typeof(ICommand).IsAssignableFrom(type) && type.IsClass);
         foreach (var type in types)
         {
-            services.AddSingleton(typeof(ICommand), type);
+            services.AddScoped(typeof(ICommand), type);
         }
         
         services.AddSingleton<UpdateHandlers>();
@@ -39,7 +39,7 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddHostedService<PollingService>();
 
         services.AddHttpClient();
-        services.AddSingleton<IMyApiService, MyApiService>();
+        services.AddScoped<IMyApiService, MyApiService>();
     })
     .Build();
 
