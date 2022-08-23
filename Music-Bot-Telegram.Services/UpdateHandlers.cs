@@ -7,6 +7,7 @@ using Music_Bot_Telegram.Services.Commands;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
+using Music_Bot_Telegram.Data.Models;
 
 namespace Music_Bot_Telegram.Services;
 
@@ -47,6 +48,18 @@ public class UpdateHandlers
         await handler;
     }
 
+    private async Task<Data.Models.User?> GetValidUserAsync(IUnitOfWork unitOfWork, Message message)
+    {
+        if (unitOfWork.Users.Get(message.From!.Id) is not { } user)
+        {
+            user = new Data.Models.User(message.From.Id);
+            unitOfWork.Users.Insert(user);
+            await unitOfWork.SaveAsync();
+        }
+
+        return user.IsBanned ? null : user;
+    }
+    
     private async Task OnMessageAsync(ITelegramBotClient botClient, Message message, IServiceScope scope, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(message.Text))
@@ -54,12 +67,8 @@ public class UpdateHandlers
 
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         
-        if (unitOfWork.Users.Get(message.From!.Id) is not { } user)
-        {
-            user = new Data.Models.User(message.From.Id);
-            unitOfWork.Users.Insert(user);
-            await unitOfWork.SaveAsync();
-        }
+        if (await GetValidUserAsync(unitOfWork, message) is not { } user)
+            return;
 
         if (!user.IsActiveSession && !message.Text.StartsWith("/"))
             return;
