@@ -19,7 +19,7 @@ var host = Host.CreateDefaultBuilder(args)
         // db
         services.AddDbContextFactory<BotDbContext>(o =>
             o.UseNpgsql(context.Configuration.GetSection("Database:ConnectionString").Value));
-        services.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
             
         // services
         var types = typeof(ICommand).Assembly.GetTypes()
