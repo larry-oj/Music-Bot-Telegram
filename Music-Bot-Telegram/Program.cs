@@ -17,10 +17,9 @@ var host = Host.CreateDefaultBuilder(args)
             context.Configuration.GetSection(MyApiConfiguration.Configuration));
 
         // db
-        services.AddDbContextFactory<BotDbContext>(o =>
+        services.AddDbContext<BotDbContext>(o =>
             o.UseNpgsql(context.Configuration.GetSection("Database:ConnectionString").Value));
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-            
+
         // services
         var types = typeof(ICommand).Assembly.GetTypes()
             .Where(type => typeof(ICommand).IsAssignableFrom(type) && type.IsClass);

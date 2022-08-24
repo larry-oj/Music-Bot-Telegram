@@ -48,13 +48,13 @@ public class UpdateHandlers
         await handler;
     }
 
-    private async Task<Data.Models.User?> GetValidUserAsync(IUnitOfWork unitOfWork, Message message)
+    private async Task<Data.Models.User?> GetValidUserAsync(BotDbContext context, Message message)
     {
-        if (unitOfWork.Users.Get(message.From!.Id) is not { } user)
+        if (context.Users.FirstOrDefault(u => u.Id == message.From!.Id) is not { } user)
         {
-            user = new Data.Models.User(message.From.Id);
-            unitOfWork.Users.Insert(user);
-            await unitOfWork.SaveAsync();
+            user = new Data.Models.User(message.From!.Id);
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
         }
 
         return user.IsBanned ? null : user;
@@ -65,9 +65,9 @@ public class UpdateHandlers
         if (string.IsNullOrEmpty(message.Text))
             return;
 
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var context = scope.ServiceProvider.GetRequiredService<BotDbContext>();
         
-        if (await GetValidUserAsync(unitOfWork, message) is not { } user)
+        if (await GetValidUserAsync(context, message) is not { } user)
             return;
 
         if (!user.IsActiveSession && !message.Text.StartsWith("/"))
@@ -75,9 +75,10 @@ public class UpdateHandlers
 
         var commandName = user.IsActiveSession switch
         {
-            true => unitOfWork.Actions.GetAll()
+            true => context.Actions
                 .Where(u => u.User == user)
-                .MaxBy(u => u.CreatedAt)!
+                .OrderByDescending(u => u.CreatedAt)
+                .FirstOrDefault()?
                 .Command,
             
             false => message.Text
