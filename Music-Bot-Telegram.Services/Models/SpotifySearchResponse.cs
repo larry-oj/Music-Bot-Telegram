@@ -6,6 +6,31 @@ public class SpotifySearchResponse
 {
     [JsonPropertyName("tracks")]
     public List<Track> Tracks { get; set; }
+
+    public override string ToString()
+    {
+        var @string = "";
+        var artists = "";
+
+        if (Tracks.Count == 0)
+        {
+            @string += "No tracks found";
+        }
+        else
+        {
+            foreach (var track in Tracks)
+            {
+                @string += "Title: " + track.Name + "\n";
+                artists = track.Artists!.Aggregate(artists, (current, artist) => current + (artist.Name + ", "));
+                @string += "Artist(-s): " + artists.TrimEnd(',', ' ') + "\n";
+                @string += "Link: " + track.ExternalUrls.Spotify + "\n";
+                @string += "\n";
+                artists = "";
+            }
+        }
+
+        return @string;
+    }
 }
 
 public class Track

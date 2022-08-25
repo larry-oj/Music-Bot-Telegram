@@ -6,6 +6,28 @@ public class YouTubeSearchResponse
 {
     [JsonPropertyName("items")]
     public List<Item> Items { get; set; }
+
+    public override string ToString()
+    {
+        var @string = "";
+
+        if (Items.Count == 0)
+        {
+            @string += "No videos found";
+        }
+        else
+        {
+            foreach (var item in Items)
+            {
+                @string += "Title: " + item.Snippet.Title + "\n";
+                @string += "Channel: " + item.Snippet.ChannelTitle + "\n";
+                @string += "Link: https://youtu.be/" + item.VideoId + "\n";
+                @string += "\n";
+            }
+        }
+        
+        return @string;
+    }
 }
 
 public class Item
