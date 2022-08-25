@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Music_Bot_Telegram.Data;
-using Music_Bot_Telegram.Data.Models;
 using Music_Bot_Telegram.Services.Commands;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -75,12 +74,7 @@ public class UpdateHandlers
 
         var commandName = user.IsActiveSession switch
         {
-            true => context.Actions
-                .Where(u => u.User == user)
-                .OrderByDescending(u => u.CreatedAt)
-                .FirstOrDefault()?
-                .Command,
-            
+            true => user.SessionCommand,
             false => message.Text
                 .Split(null)[0]
                 .Replace("/", "")
