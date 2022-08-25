@@ -9,5 +9,5 @@ public interface IMyApiService
     Task<SpotifySearchResponse> SearchSpotifyAsync(string query);
     Task<ConverterEnqueueResponse> EnqueueConversionAsync(string url);
     Task<ConverterStatusResponse> GetConversionStatusAsync(string id);
-    Task<Stream> GetConversionResultAsync(string id);
+    Task<(string, Stream)> GetConversionResultAsync(string id);
 }

@@ -73,13 +73,13 @@ public class MyApiService : IMyApiService
     {
         var uri = new Uri($"{_options.BaseUrl}/{_options.ConverterUrl}/videos");
 
-        var body = new StringContent("{\"url\":\"" + url + "\"}");
+        var body = new ConverterEnqueueRequest(url);
 
         var request = new HttpRequestMessage
         {
             Method = HttpMethod.Post,
             RequestUri = uri,
-            Content = body
+            Content = JsonContent.Create(body)
         };
         
         var response = await _httpClient.SendAsync(request);
@@ -91,7 +91,7 @@ public class MyApiService : IMyApiService
 
     public async Task<ConverterStatusResponse> GetConversionStatusAsync(string id)
     {
-        var uri = new Uri($"{_options.BaseUrl}/{_options.ConverterUrl}/vidoes/{id}/status");
+        var uri = new Uri($"{_options.BaseUrl}/{_options.ConverterUrl}/videos/{id}/status");
 
         var request = new HttpRequestMessage
         {
@@ -101,14 +101,14 @@ public class MyApiService : IMyApiService
         
         var response = await _httpClient.SendAsync(request);
         var content = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode) throw new ApiErrorResponse(content);
+        // if (!response.IsSuccessStatusCode) throw new ApiErrorResponse(content);
         
         return JsonSerializer.Deserialize<ConverterStatusResponse>(content)!;
     }
 
-    public async Task<Stream> GetConversionResultAsync(string id)
+    public async Task<(string, Stream)> GetConversionResultAsync(string id)
     {
-        var uri = new Uri($"{_options.BaseUrl}/{_options.ConverterUrl}/vidoes/{id}");
+        var uri = new Uri($"{_options.BaseUrl}/{_options.ConverterUrl}/videos/{id}");
 
         var request = new HttpRequestMessage
         {
@@ -118,8 +118,9 @@ public class MyApiService : IMyApiService
         
         var response = await _httpClient.SendAsync(request);
         var content = await response.Content.ReadAsStreamAsync();
+        var filename = response.Content.Headers.ContentDisposition!.FileName!.Trim('"');
         if (!response.IsSuccessStatusCode) throw new ApiErrorResponse();
         
-        return content!;
+        return (filename, content)!;
     }
 }

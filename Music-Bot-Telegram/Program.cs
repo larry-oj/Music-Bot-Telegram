@@ -36,6 +36,7 @@ var host = Host.CreateDefaultBuilder(args)
             return new TelegramBotClient(options);
         });
         services.AddHostedService<PollingService>();
+        services.AddHostedService<FetchFileTimedService>();
 
         services.AddHttpClient();
         services.AddScoped<IMyApiService, MyApiService>();
