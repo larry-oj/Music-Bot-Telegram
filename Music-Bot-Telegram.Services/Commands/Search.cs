@@ -77,18 +77,19 @@ public class Search : ICommand
     
     private async Task StageOne(ITelegramBotClient botClient, Message message, Data.Models.User user)
     {
-        var keyboard = new ReplyKeyboardMarkup(new[]
+        if (message.Text!.ToLower() != "youtube" && message.Text!.ToLower() != "spotify")
         {
-            new[]
-            {
-                new KeyboardButton("/cancel")
-            }
-        });
-        
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "Invalid platform provided");
+            await StageZero(botClient, message, user);
+            return;
+        }
+
         await botClient.SendTextMessageAsync(
             message.Chat.Id,
-            "Enter search query:",
-            replyMarkup: keyboard);
+            "Enter search query:\nUse /cancel to cancel",
+            replyMarkup: new ReplyKeyboardRemove());
         
         user.SessionData = message.Text!.ToLower();
         user.SessionStage = 2;
@@ -114,15 +115,13 @@ public class Search : ICommand
                 break;
             
             default:
-                throw new ArgumentException("Invalid platform provided");
-                break;
+                return;
         }
 
         await botClient.SendPhotoAsync(
             chatId: message.Chat.Id,
             photo: imageUrl,
-            caption: text,
-            replyMarkup: new ReplyKeyboardRemove());
+            caption: text);
 
         user.IsActiveSession = false;
         user.SessionCommand = null;
