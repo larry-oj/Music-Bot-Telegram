@@ -8,10 +8,12 @@ public class User : IEntity
     public bool IsAdmin { get; set; } = false;
     public bool IsBanned { get; set; } = false;
     public bool IsActiveSession { get; set; } = false;
+    public string? SessionCommand { get; set; }
+    public string? SessionData { get; set; }
+    public int? SessionStage { get; set; }
     public bool IsActiveConversion { get; set; } = false;
     public string? ConversionId { get; set; }
-    public List<Action> Actions { get; set; }
-
+    
     public User()
     {
     }
