@@ -7,6 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Music_Bot_Telegram.Data.Models;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Music_Bot_Telegram.Services;
 
@@ -81,6 +82,12 @@ public class UpdateHandlers
                 .ToLower()
         };
         
+        // but, if /cancel
+        if (message.Text!.ToLower() == "/cancel")
+        {
+            commandName = "cancel";
+        }
+        
         var commands = scope.ServiceProvider.GetRequiredService<IEnumerable<ICommand>>();
         
         var command = commands.FirstOrDefault(c => c.Name == commandName);
@@ -93,7 +100,19 @@ public class UpdateHandlers
             
             return;
         }
-        await command.ExecuteAsync(botClient, message, user);
+
+        try
+        {
+            await command.ExecuteAsync(botClient, message, user);
+        }
+        catch (Exception ex)
+        {
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat!.Id, 
+                text: ex.Message, 
+                cancellationToken: cancellationToken);
+        }
+        
     }
     
     private Task OnUnknownAsync(Update update, CancellationToken cancellationToken = default)
