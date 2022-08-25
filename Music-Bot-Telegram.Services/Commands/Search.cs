@@ -56,6 +56,7 @@ public class Search : ICommand
         {
             new[]
             {
+                new KeyboardButton("Everywhere"),
                 new KeyboardButton("YouTube"),
                 new KeyboardButton("Spotify")
             },
@@ -77,7 +78,9 @@ public class Search : ICommand
     
     private async Task StageOne(ITelegramBotClient botClient, Message message, Data.Models.User user)
     {
-        if (message.Text!.ToLower() != "youtube" && message.Text!.ToLower() != "spotify")
+        if (message.Text!.ToLower() != "youtube" && 
+            message.Text!.ToLower() != "spotify" &&
+            message.Text!.ToLower() != "everywhere")
         {
             await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
@@ -114,6 +117,20 @@ public class Search : ICommand
                 imageUrl = spData.Tracks.First().Album.Covers.First().Url;
                 break;
             
+            case "everywhere":
+                ytData = await _api.SearchYoutubeAsync(message.Text!);
+                spData = await _api.SearchSpotifyAsync(message.Text!);
+                text = "Youtube:\n";
+                text += "Name: " + ytData.Items.First().Snippet.Title + "\n";
+                text += "Channel: " + ytData.Items.First().Snippet.ChannelTitle + "\n";
+                text += "Link: https://youtu.be/" + ytData.Items.First().VideoId + "\n";
+                text += "\nSpotify:\n";
+                text += "Name: " + spData.Tracks.First().Name + "\n";
+                text += "Artist: " + spData.Tracks.First().Artists!.First().Name + "\n";
+                text += "Link: " + spData.Tracks.First().ExternalUrls.Spotify + "\n";
+                imageUrl = ytData.Items.First().Snippet.Thumbnails.High.Url;
+                break;
+                
             default:
                 return;
         }
