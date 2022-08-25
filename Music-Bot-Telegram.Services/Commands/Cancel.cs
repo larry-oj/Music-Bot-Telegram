@@ -11,7 +11,7 @@ public class Cancel : ICommand
         => "cancel";
     
     public string Description 
-        => "[PH] cancel command";
+        => "Cancels current operation";
 
     public bool IsAdmin 
         => false;

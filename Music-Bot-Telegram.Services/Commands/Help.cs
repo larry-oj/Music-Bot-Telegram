@@ -11,7 +11,7 @@ public class Help : ICommand
         => "help";
     
     public string Description 
-        => "[PH] help command description";
+        => "Gives you the list of all commands";
     
     public bool IsAdmin 
         => false;

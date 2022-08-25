@@ -12,7 +12,7 @@ public class Search : ICommand
         => "search";
     
     public string Description 
-        => "Super secret command";
+        => "Searches for music on popular music providers";
 
     public bool IsAdmin 
         => false;
@@ -84,7 +84,7 @@ public class Search : ICommand
         {
             await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "Invalid platform provided");
+                text: "Invalid platform provided!\nTry again");
             await StageZero(botClient, message, user);
             return;
         }
