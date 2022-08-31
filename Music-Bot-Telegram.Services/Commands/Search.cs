@@ -102,43 +102,96 @@ public class Search : ICommand
     {
         var text = "";
         var imageUrl = "";
+        var spPreview = "";
+        var spTitle = "";
         
         switch (user.SessionData)
         {
             case "youtube":
                 var ytData = await _api.SearchYoutubeAsync(message.Text!);
-                text = ytData.ToString();
-                imageUrl = ytData.Items.First().Snippet.Thumbnails.High.Url;
+                if (ytData.Items.Count > 0)
+                {
+                    text = ytData.ToString();
+                    imageUrl = ytData.Items.First().Snippet.Thumbnails.High.Url;
+                }
+                else
+                {
+                    text = "Sorry, nothing was found!";
+                }
                 break;
             
             case "spotify":
                 var spData = await _api.SearchSpotifyAsync(message.Text!);
-                text = spData.ToString();
-                imageUrl = spData.Tracks.First().Album.Covers.First().Url;
+                if (spData.Tracks.Count > 0)
+                {
+                    text = spData.ToString();
+                    imageUrl = spData.Tracks.First().Album.Covers.First().Url;
+                    spPreview = spData.Tracks.First().PreviewUrl ?? "";
+                    spTitle = spData.Tracks.First().Name;
+                }
+                else
+                {
+                    text = "Sorry, nothing was found!";
+                }
                 break;
             
             case "everywhere":
                 ytData = await _api.SearchYoutubeAsync(message.Text!);
                 spData = await _api.SearchSpotifyAsync(message.Text!);
-                text = "Youtube:\n";
-                text += "Name: " + ytData.Items.First().Snippet.Title + "\n";
-                text += "Channel: " + ytData.Items.First().Snippet.ChannelTitle + "\n";
-                text += "Link: https://youtu.be/" + ytData.Items.First().VideoId + "\n";
-                text += "\nSpotify:\n";
-                text += "Name: " + spData.Tracks.First().Name + "\n";
-                text += "Artist: " + spData.Tracks.First().Artists!.First().Name + "\n";
-                text += "Link: " + spData.Tracks.First().ExternalUrls.Spotify + "\n";
-                imageUrl = ytData.Items.First().Snippet.Thumbnails.High.Url;
+                if (ytData.Items.Count > 0)
+                {
+                    text = "Youtube:\n";
+                    text += "Name: " + ytData.Items.First().Snippet.Title + "\n";
+                    text += "Channel: " + ytData.Items.First().Snippet.ChannelTitle + "\n";
+                    text += "Link: https://youtu.be/" + ytData.Items.First().VideoId + "\n\n";
+                }
+                if (spData.Tracks.Count > 0)
+                {
+                    text += "Spotify:\n";
+                    text += "Name: " + spData.Tracks.First().Name + "\n";
+                    text += "Artist: " + spData.Tracks.First().Artists!.First().Name + "\n";
+                    text += "Link: " + spData.Tracks.First().ExternalUrls.Spotify + "\n";
+                    spPreview = spData.Tracks.First().PreviewUrl ?? "";
+                    spTitle = spData.Tracks.First().Name;
+                }
+
+                if (text == "")
+                {
+                    text = "Sorry, nothing was found!";
+                }
+                else
+                {
+                    imageUrl = ytData.Items.First().Snippet.Thumbnails.High.Url;
+                }
                 break;
                 
             default:
                 return;
         }
 
-        await botClient.SendPhotoAsync(
-            chatId: message.Chat.Id,
-            photo: imageUrl,
-            caption: text);
+        if (text == "Sorry, nothing was found!")
+        {
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: text);
+        }
+        else
+        {
+            await botClient.SendPhotoAsync(
+                chatId: message.Chat.Id,
+                photo: imageUrl,
+                caption: text);
+            
+            if (spPreview is not "")
+            {
+                await botClient.SendAudioAsync(
+                    chatId: message.Chat.Id,
+                    audio: spPreview!,
+                    caption: "Spotify Preview");
+            }
+        }
+
+        
 
         user.IsActiveSession = false;
         user.SessionCommand = null;
