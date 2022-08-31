@@ -161,6 +161,7 @@ public class UpdateHandlers
         var song = data.Title + " - " + data.Artist;
         var ytData = await api.SearchYoutubeAsync(song);
         var spData = await api.SearchSpotifyAsync(song);
+        var spPreview = "";
         var @string = "";
         @string += "Title: " + data.Title + "\n";
         @string += "Artist: " + data.Artist + "\n";
@@ -168,13 +169,26 @@ public class UpdateHandlers
         if (ytData.Items.Count > 0)
             @string += "YouTube: https://youtu.be/" + ytData.Items.First().VideoId + "\n";
         if (spData.Tracks.Count > 0)
+        {
             @string += "Spotify: " + spData.Tracks.First().ExternalUrls.Spotify + "\n";
+            spPreview = spData.Tracks.First().PreviewUrl ?? "";
+        }
+            
 
         await botClient.SendPhotoAsync(
             chatId: message.Chat.Id,
             photo: ytData.Items.First().Snippet.Thumbnails.High.Url,
             caption: @string, 
             cancellationToken: cancellationToken);
+
+        if (spPreview is not "")
+        {
+            await botClient.SendAudioAsync(
+                chatId: message.Chat.Id,
+                audio: spPreview!,
+                caption: "Spotify Preview", 
+                cancellationToken: cancellationToken);
+        }
     }
 
     private Task OnUnknownAsync(Update update, CancellationToken cancellationToken = default)
