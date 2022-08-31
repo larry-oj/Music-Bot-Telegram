@@ -4,7 +4,7 @@ namespace Music_Bot_Telegram.Services;
 
 public interface IMyApiService
 {
-    Task<object> RecognizeAsync(string url);
+    Task<RecognitionResponse?> RecognizeAsync(string url);
     Task<YouTubeSearchResponse> SearchYoutubeAsync(string query);
     Task<SpotifySearchResponse> SearchSpotifyAsync(string query);
     Task<ConverterEnqueueResponse> EnqueueConversionAsync(string url);

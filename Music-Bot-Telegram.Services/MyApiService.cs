@@ -26,9 +26,24 @@ public class MyApiService : IMyApiService
     }
 
 
-    public async Task<object> RecognizeAsync(string url)
+    public async Task<RecognitionResponse?> RecognizeAsync(string url)
     {
-        throw new NotImplementedException();
+        var uri = new Uri($"{_options.BaseUrl}/{_options.RecognizeUrl}");
+
+        var body = new RecognitionRequest(url);
+
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = uri,
+            Content = JsonContent.Create(body)
+        };
+        
+        var response = await _httpClient.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+        // if (!response.IsSuccessStatusCode) throw new ApiErrorResponse(content);
+        
+        return content == "" ? null : JsonSerializer.Deserialize<RecognitionResponse>(content);
     }
 
     public async Task<YouTubeSearchResponse> SearchYoutubeAsync(string query)

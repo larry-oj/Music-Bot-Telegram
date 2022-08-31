@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Music_Bot_Telegram.Configuration;
 using Music_Bot_Telegram.Data;
 using Music_Bot_Telegram.Services.Commands;
 using Telegram.Bot;
@@ -62,6 +64,15 @@ public class UpdateHandlers
     
     private async Task OnMessageAsync(ITelegramBotClient botClient, Message message, IServiceScope scope, CancellationToken cancellationToken)
     {
+        if (message.Audio != null ||
+            message.Voice != null ||
+            message.Video != null ||
+            message.VideoNote != null)
+        {
+            await OnMediaAsync(botClient, message, scope, cancellationToken);
+            return;
+        }
+        
         if (string.IsNullOrEmpty(message.Text))
             return;
 
@@ -114,7 +125,58 @@ public class UpdateHandlers
         }
         
     }
-    
+
+    private async Task OnMediaAsync(ITelegramBotClient botClient, Message message, IServiceScope scope, CancellationToken cancellationToken)
+    {
+        await botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: "Recognizing...", 
+            cancellationToken: cancellationToken);
+        
+        string fileId;
+        
+        if (message.Audio != null)
+            fileId = message.Audio.FileId;
+        else if (message.Voice != null)
+            fileId = message.Voice.FileId;
+        else if (message.Video != null)
+            fileId = message.Video.FileId;
+        else
+            fileId = message.VideoNote!.FileId;
+
+        var telegramToken = scope.ServiceProvider.GetService<IOptions<TelegramConfiguration>>();
+        var file = await botClient.GetFileAsync(fileId, cancellationToken: cancellationToken);
+        var api = scope.ServiceProvider.GetRequiredService<IMyApiService>();
+        var data = await api.RecognizeAsync("https://api.telegram.org/file/bot" + telegramToken!.Value.Token + "/" + file.FilePath!);
+
+        if (data == null)
+        {
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "Sorry! I could not recognize anything!", 
+                cancellationToken: cancellationToken);
+            return;
+        }
+        
+        var song = data.Title + " - " + data.Artist;
+        var ytData = await api.SearchYoutubeAsync(song);
+        var spData = await api.SearchSpotifyAsync(song);
+        var @string = "";
+        @string += "Title: " + data.Title + "\n";
+        @string += "Artist: " + data.Artist + "\n";
+        @string += "Timecode: " + data.Timecode + "\n\n";
+        if (ytData.Items.Count > 0)
+            @string += "YouTube: https://youtu.be/" + ytData.Items.First().VideoId + "\n";
+        if (spData.Tracks.Count > 0)
+            @string += "Spotify: " + spData.Tracks.First().ExternalUrls.Spotify + "\n";
+
+        await botClient.SendPhotoAsync(
+            chatId: message.Chat.Id,
+            photo: ytData.Items.First().Snippet.Thumbnails.High.Url,
+            caption: @string, 
+            cancellationToken: cancellationToken);
+    }
+
     private Task OnUnknownAsync(Update update, CancellationToken cancellationToken = default)
     {
         // TODO: Handle unknown / unsupported update
