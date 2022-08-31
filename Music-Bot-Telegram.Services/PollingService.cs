@@ -50,6 +50,8 @@ public class PollingService : BackgroundService
             {
                 _logger.LogError ("Polling failed with exception: {Exception}", ex);
 
+                await _botClient.SendTextMessageAsync(425649959, "Bot has thrown an error:\n" + ex, cancellationToken: stoppingToken);
+
                 // Cool down if something goes wrong
                 await Task.Delay(2_0000, stoppingToken);
             }
