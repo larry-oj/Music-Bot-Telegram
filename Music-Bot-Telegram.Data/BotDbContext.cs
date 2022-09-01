@@ -6,6 +6,7 @@ namespace Music_Bot_Telegram.Data;
 public class BotDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<RequestMeter> RequestMeters { get; set; }
 
     public BotDbContext(DbContextOptions<BotDbContext> options)
         : base(options)
