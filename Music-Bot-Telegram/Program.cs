@@ -37,6 +37,7 @@ var host = Host.CreateDefaultBuilder(args)
         });
         services.AddHostedService<PollingService>();
         services.AddHostedService<FetchFileTimedService>();
+        services.AddHostedService<RequestCounterTimedService>();
 
         services.AddHttpClient();
         services.AddScoped<IMyApiService, MyApiService>();

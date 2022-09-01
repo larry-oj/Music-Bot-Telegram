@@ -9,6 +9,8 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Music_Bot_Telegram.Data.Models;
+using Music_Bot_Telegram.Services.Exceptions;
+using Music_Bot_Telegram.Services.Models;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Music_Bot_Telegram.Services;
@@ -128,6 +130,21 @@ public class UpdateHandlers
 
     private async Task OnMediaAsync(ITelegramBotClient botClient, Message message, IServiceScope scope, CancellationToken cancellationToken)
     {
+        var context = scope.ServiceProvider.GetRequiredService<BotDbContext>();
+        var meter = context.RequestMeters.FirstOrDefault()!;
+        if (meter.RequestCount >= 34 && 
+            !context.Users.FirstOrDefault(u => u.Id == message.From!.Id)!.IsAdmin)
+        {
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "Sorry! Bot has reached its daily limit.\nLearn more at /recognize", 
+                cancellationToken: cancellationToken);
+            return;
+        }
+
+        meter.RequestCount++;
+        await context.SaveChangesAsync(cancellationToken);
+        
         await botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Recognizing...", 
@@ -147,7 +164,21 @@ public class UpdateHandlers
         var telegramToken = scope.ServiceProvider.GetService<IOptions<TelegramConfiguration>>();
         var file = await botClient.GetFileAsync(fileId, cancellationToken: cancellationToken);
         var api = scope.ServiceProvider.GetRequiredService<IMyApiService>();
-        var data = await api.RecognizeAsync("https://api.telegram.org/file/bot" + telegramToken!.Value.Token + "/" + file.FilePath!);
+        RecognitionResponse? data;
+        try
+        {
+            data = await api.RecognizeAsync("https://api.telegram.org/file/bot" + telegramToken!.Value.Token + "/" + file.FilePath!);
+        }
+        catch (Exception e)
+        {
+            if (e is not ApiErrorResponse) throw;
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: "Sorry! There was an error recognizing your media!\nIt is likely that media you sent me contains unsupported audio format.", 
+                cancellationToken: cancellationToken);
+            return;
+
+        }
 
         if (data == null)
         {

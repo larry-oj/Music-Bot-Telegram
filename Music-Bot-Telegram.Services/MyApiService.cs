@@ -41,7 +41,7 @@ public class MyApiService : IMyApiService
         
         var response = await _httpClient.SendAsync(request);
         var content = await response.Content.ReadAsStringAsync();
-        // if (!response.IsSuccessStatusCode) throw new ApiErrorResponse(content);
+        if (response.IsSuccessStatusCode == false) throw new ApiErrorResponse(content);
         
         return content == "" ? null : JsonSerializer.Deserialize<RecognitionResponse>(content);
     }
