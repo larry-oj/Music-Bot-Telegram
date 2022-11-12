@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-Music_Bot_Telegram-D185E8BA-5A71-403B-9AFE-7A30A88E2614</UserSecretsId>
         <RootNamespace>Music_Bot_Telegram</RootNamespace>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
